@@ -20,21 +20,25 @@ bot.on("messageCreate", (msg) => { // When a message is created
             const mixer = new MixerStream(16, 2, 48000);
 
             connection.on('speakingStart', user => {
-                console.log('1', user)
+                console.log('\nspeakingStart', user)
             })
             connection.on('speakingStop', user => {
-                console.log('1', user)
+                console.log('\nspeakingStop', user)
             })
             connection.on('disconnect', user => {
-                console.log('2', user)
+                console.log('\ndisconnect', user)
                 // delete users[user]
+                if (users[user]) {
+                    users[user].end()
+                    delete users[user]
+                }
             })
 
             const streams = connection.receive('pcm')
             streams.on('data', (buffer, user) => {
                 // console.log('3', , user)
                 if (!users[user]) {
-                    console.log('3', user)
+                    console.log('\nstream initialized', user)
                     users[user] = new PassThrough()
                     mixer.addSource(users[user])
                 }
